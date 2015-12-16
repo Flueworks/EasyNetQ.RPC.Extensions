@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,15 +23,23 @@ namespace EasyNetQ.RPC.Extensions
 
         private object CallServer(RabbitDelegateMessage message)
         {
-            if (!IsConnected) { throw new NotConnectedException(); }
-            RabbitResponseMessage response = Bus.Request<RabbitDelegateMessage, RabbitResponseMessage>(message);
-
-            if (response.Exception != null)
+            try
             {
-                throw response.Exception;
-            }
+                if (!IsConnected) { throw new NotConnectedException(); }
+                RabbitResponseMessage response = Bus.Request<RabbitDelegateMessage, RabbitResponseMessage>(message);
 
-            return response.Reply;
+                if (response.Exception != null)
+                {
+                    throw response.Exception;
+                }
+                var reply = response.Reply as IInternalValueProvider;
+                return reply.GetValue();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public TServer GetServerProxy() => (TServer)_rabbitProxy.GetTransparentProxy();

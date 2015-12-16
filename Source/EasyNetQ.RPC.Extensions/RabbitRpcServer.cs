@@ -21,17 +21,11 @@ namespace EasyNetQ.RPC.Extensions
             try
             {
                 var reply = methodInfo.Invoke(_server, rabbitDelegateMessage.Args);
-                return new RabbitResponseMessage
-                {
-                    Reply = reply
-                };
+                return new RabbitResponseMessage(reply);
             }
             catch (TargetInvocationException e)
             {
-                return new RabbitResponseMessage()
-                {
-                    Exception = e.InnerException
-                };
+                return new RabbitResponseMessage(e.InnerException);
             }
         }
 

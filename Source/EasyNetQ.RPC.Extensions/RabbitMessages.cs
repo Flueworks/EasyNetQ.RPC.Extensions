@@ -19,7 +19,7 @@ namespace EasyNetQ.RPC.Extensions
         public RabbitDelegateMessage(string method, object[] args = null)
         {
             Method = method;
-            SendArguments = args?.Select(CreateObjects).ToArray();
+            SendArguments = args?.Select(CreateObjectEx).ToArray();
         }
 
         public string Method { get; set; }
@@ -33,7 +33,7 @@ namespace EasyNetQ.RPC.Extensions
         /// </summary>
         /// <param name="o"></param>
         /// <returns></returns>
-        private static object CreateObjects(object o)
+        private static object CreateObjectEx(object o)
         {
             var type = typeof(ObjectEx<>);
             var makeGenericType = type.MakeGenericType(o.GetType());
@@ -45,23 +45,49 @@ namespace EasyNetQ.RPC.Extensions
 
     public class RabbitResponseMessage
     {
+        /// <summary>
+        /// Json serializer requires empty constructor
+        ///  </summary>
+        public RabbitResponseMessage()
+        {
+            
+        }
+
+        public RabbitResponseMessage(object result)
+        {
+            Reply = CreateObjectEx(result);
+        }
+
+        public RabbitResponseMessage(Exception ex)
+        {
+            Exception = ex;
+        }
+
         public object Reply { get; set; }
+
         public Exception Exception { get; set; }
+
+        private static object CreateObjectEx(object o)
+        {
+            if (o == null)
+            {
+                return new ObjectEx<object>() {Value = null};
+            }
+            var type = typeof(ObjectEx<>);
+            var makeGenericType = type.MakeGenericType(o.GetType());
+            var target = Activator.CreateInstance(makeGenericType) as IInternalValueProvider;
+            target.SetValue(o);
+            return target;
+        }
     }
 
     public class ObjectEx<T> : IInternalValueProvider
     {
         public T Value { get; set; }
 
-        public object GetValue()
-        {
-            return Value;
-        }
+        public object GetValue() => Value;
 
-        public void SetValue(object o)
-        {
-            Value = (T)o;
-        }
+        public void SetValue(object o) => Value = (T)o;
     }
 
     public interface IInternalValueProvider
