@@ -19,7 +19,7 @@ namespace EasyNetQ.RPC.Extensions
         public RabbitDelegateMessage(string method, object[] args = null)
         {
             Method = method;
-            SendArguments = args?.Select(CreateObjectEx).ToArray();
+            SendArguments = args?.Select(ObjectExExtension.CreateObjectEx).ToArray();
         }
 
         public string Method { get; set; }
@@ -28,19 +28,8 @@ namespace EasyNetQ.RPC.Extensions
 
         public object[] Args => SendArguments.Select(x => ((IInternalValueProvider)x).GetValue()).ToArray();
 
-        /// <summary>
-        /// Makes a strongly typed class that will force the serializer to keep the 
-        /// </summary>
-        /// <param name="o"></param>
-        /// <returns></returns>
-        private static object CreateObjectEx(object o)
-        {
-            var type = typeof(ObjectEx<>);
-            var makeGenericType = type.MakeGenericType(o.GetType());
-            var target = Activator.CreateInstance(makeGenericType) as IInternalValueProvider;
-            target.SetValue(o);
-            return target;
-        }
+        
+        
     }
 
     public class RabbitResponseMessage
@@ -55,7 +44,7 @@ namespace EasyNetQ.RPC.Extensions
 
         public RabbitResponseMessage(object result)
         {
-            Reply = CreateObjectEx(result);
+            Reply = ObjectExExtension.CreateObjectEx(result);
         }
 
         public RabbitResponseMessage(Exception ex)
@@ -66,19 +55,6 @@ namespace EasyNetQ.RPC.Extensions
         public object Reply { get; set; }
 
         public Exception Exception { get; set; }
-
-        private static object CreateObjectEx(object o)
-        {
-            if (o == null)
-            {
-                return new ObjectEx<object>() {Value = null};
-            }
-            var type = typeof(ObjectEx<>);
-            var makeGenericType = type.MakeGenericType(o.GetType());
-            var target = Activator.CreateInstance(makeGenericType) as IInternalValueProvider;
-            target.SetValue(o);
-            return target;
-        }
     }
 
     public class ObjectEx<T> : IInternalValueProvider
@@ -94,5 +70,26 @@ namespace EasyNetQ.RPC.Extensions
     {
         object GetValue();
         void SetValue(object o);
+    }
+
+    internal static class ObjectExExtension
+    {
+        /// <summary>
+        /// Makes a strongly typed class that will force the serializer to keep the 
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        internal static object CreateObjectEx(object o)
+        {
+            if (o == null)
+            {
+                return new ObjectEx<object>() { Value = null };
+            }
+            var type = typeof(ObjectEx<>);
+            var makeGenericType = type.MakeGenericType(o.GetType());
+            var target = Activator.CreateInstance(makeGenericType) as IInternalValueProvider;
+            target.SetValue(o);
+            return target;
+        }
     }
 }

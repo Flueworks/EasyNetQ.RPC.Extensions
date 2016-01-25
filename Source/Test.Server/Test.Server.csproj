@@ -4,16 +4,18 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{01FBF507-2566-493F-AB8D-53F3F9B2E9DA}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{749FF266-872B-4D98-99BA-2D61657F6236}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EasyNetQ.RPC.Extensions</RootNamespace>
-    <AssemblyName>EasyNetQ.RPC.Extensions</AssemblyName>
+    <RootNamespace>Test.Server</RootNamespace>
+    <AssemblyName>Test.Server</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,6 +25,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -31,17 +34,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EasyNetQ, Version=0.53.0.411, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\EasyNetQ.0.53.0.411\lib\net45\EasyNetQ.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="RabbitMQ.Client, Version=3.5.6.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
-      <HintPath>..\packages\RabbitMQ.Client.3.5.6\lib\net40\RabbitMQ.Client.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -50,19 +44,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NotConnectedException.cs" />
+    <Compile Include="CalculatorModule.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RabbitBroadcasterPublisher.cs" />
-    <Compile Include="RabbitBroadcasterSubscriber.cs" />
-    <Compile Include="RabbitConnection.cs" />
-    <Compile Include="RabbitMessages.cs" />
-    <Compile Include="RabbitRpcClient.cs" />
-    <Compile Include="RabbitRpcServer.cs" />
-    <Compile Include="Utils\Conventions.cs" />
-    <Compile Include="Utils\RabbitProxy.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EasyNetQ.RPC.Extensions\EasyNetQ.RPC.Extensions.csproj">
+      <Project>{01fbf507-2566-493f-ab8d-53f3f9b2e9da}</Project>
+      <Name>EasyNetQ.RPC.Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Test.Shared\Test.Shared.csproj">
+      <Project>{4648CB86-1152-4A88-AEF5-DD5185A8FD8A}</Project>
+      <Name>Test.Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
